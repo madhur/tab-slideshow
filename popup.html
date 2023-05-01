@@ -5,27 +5,41 @@
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"
         integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+        <link rel="stylesheet" href="./popup.css">
+
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="./jquery-3.6.4.min.js"  crossorigin="anonymous"></script>
+        <script src="./bootstrap.min.js"  crossorigin="anonymous"></script>
 </head>
 
-<body>
+<body style="height: 500px; width: 500px">
     <div class="container">
-        <h3>Tab Slideshow</h3>
         <div class="row">
+            <div class="col-xs-6">
+                <h3>Tab Slideshow</h3>
+            </div>
+            <div class="col-xs-6">
+                <br/>
+                <button name="Start" id="startButton">Start</button>
+            </div>
 
-            
-            <input type="radio" id="10sec" name="10sec" value="10">
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+            <input type="radio" id="10sec" name="interval" value="10">
             <label for="5sec">10 seconds</label>
 
 
-            <input type="radio" id="15sec" name="15sec" value="15">
+            <input type="radio" id="15sec" name="interval" value="15">
             <label for="15sec">15 seconds</label>
 
-            <input type="radio" id="30sec" name="30sec" value="30">
+            <input type="radio" id="30sec" name="interval" value="30">
             <label for="30sec">30 seconds</label>
 
-            <input type="radio" id="custom" name="custom" value="0">
-            <label for="custom"><input type="number" id="customval" name="customval" min="30" max="60" value="45"> seconds</label>
-
+            <input type="radio" id="custom" name="interval" value="0">
+            <label for="custom"><input type="number" id="customval" name="customval" min="30" max="60" value="45">
+                seconds</label>
+            </div>
         </div>
     </div>
 

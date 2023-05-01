@@ -3,11 +3,14 @@ const CopyPlugin = require('copy-webpack-plugin');
 module.exports = {
     mode: "production",
     entry: {
-     "input": ['./src/popup.ts', './src/tabslideshow.ts']
+        "popup": ['./src/popup.ts'],
+        "options": ['./src/options.ts'],
+        "background": ['./src/background.ts']
     },
     output: {
         path: path.join(__dirname, "../dist"),
-        filename: "popup.js",
+        filename: "[name].js",
+        clean: true
     },
     resolve: {
         extensions: [".ts", ".js"],
@@ -23,7 +26,12 @@ module.exports = {
     },
     plugins: [
         new CopyPlugin({
-            patterns: [{ from: "./popup.html", to: "." }]
+            patterns: [{ from: "./popup.*", to: "." },
+            { from: "./manifest.json", to: "." },
+            { from: "./*.html", to: "." },
+            { from: "vendor", to: "." },
+            { from: "images", to: "./images" }]
+
         }),
     ],
 };
