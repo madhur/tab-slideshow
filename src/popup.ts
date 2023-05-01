@@ -1,5 +1,5 @@
 chrome.storage.local.get(["default_interval"]).then((result) => {
-    console.log("Value currently is " + result.key);
+    console.log("Value currently default_interval is " + result.key);
     if (!result) {
         const ele = document.getElementById("10sec") as HTMLInputElement;
         ele.checked = true;
@@ -15,9 +15,9 @@ chrome.storage.local.get(["default_interval"]).then((result) => {
     }
 });
 
-const start = () => {
+const start_stop = () => {
 
-    chrome.runtime.sendMessage('start', (response) => {
+    chrome.runtime.sendMessage('start_stop', (response) => {
         // 3. Got an asynchronous response with the data from the service worker
         console.log('received user data', response);
     });
@@ -25,12 +25,48 @@ const start = () => {
 
 
 document.addEventListener('DOMContentLoaded', function () {
-    let selectedInterval = document.querySelector('input[name="interval"]:checked').value;
-    var btn = document.getElementById('startButton');
+    let selectedElement = (document.querySelector('input[name="interval"]:checked') as HTMLInputElement);
+    let selectedInterval;
+    if (selectedElement) {
+        selectedInterval = selectedElement.value;
+    }
+    else {
+        selectedInterval = 10
+    }
+    let btn = document.getElementById('startButton');
+    btn.className = "start"
     btn.addEventListener('click', function () {
-        start();
+        start_stop();
         chrome.storage.local.set({ "default_interval": selectedInterval }).then(() => {
-            console.log("Value is set to " + selectedInterval);
+            console.log("Value default_interval is set to " + selectedInterval);
         });
+        updateButtonValue(btn);
+    });
+
+    chrome.storage.local.get(["is_running"]).then((result) => {
+        console.log("Value is_running is: " + result.is_running);
+        if (result.is_running) {
+            btn.textContent = "Stop"
+            btn.className = "stop";
+        }
+        else {
+            btn.textContent = "Start"
+            btn.className = "start";
+
+        }
+
     });
 });
+
+const updateButtonValue = (btn) => {
+    console.log(btn.textContent);
+    if (btn.textContent == "Start") {
+        btn.textContent = "Stop"
+        btn.className = "stop";
+    }
+    else {
+        btn.textContent = "Start"
+        btn.className = "start";
+    }
+
+}
