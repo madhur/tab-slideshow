@@ -1,38 +1,45 @@
 //Clear the flag on startup
-chrome.runtime.onStartup.addListener(function() {
-    console.log("clearing the is_running flag at startup");
-    chrome.storage.local.set({ "is_running": false }).then(() => {
-        console.log("Value is_running is set to " + false);
-    });
-  })
+import { getObjectFromLocalStorage, saveObjectInLocalStorage } from './storage-api';
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onStartup.addListener(function () {
+    startup();
+})
+
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     // 2. A page requested user data, respond with a copy of `user`
-    if (message === 'start_stop') {
-        chrome.storage.local.get(["is_running"]).then((result) => {
-            console.log("Value is_running is: " + result.is_running);
-            if (result.is_running) {
-                stopLooping();
-                sendResponse("Detected running, stopping");
-            }
-            else {
-                startLooping();
-                sendResponse("Detected stopped, running");
-            }
-            
-        });
-    }
+    handleMessage(message, _sender, sendResponse);
 });
 
+const startup = async () => {
+    console.log("Back: clearing the is_running flag at startup");
+    await saveObjectInLocalStorage({ "is_running": false });
+    console.log("Back: Value is_running is set to " + false);
+}
+
+const handleMessage = async (message, _sender, sendResponse) => {
+    if (message === 'start_stop') {
+        const result = await getObjectFromLocalStorage("is_running") as any;
+        console.log("Back: Value is_running is: " + JSON.stringify(result));
+        if (result) {
+            stopLooping();
+            sendResponse("Detected running, stopping");
+        }
+        else {
+            startLooping();
+            sendResponse("Detected stopped, running");
+        }
+
+    }
+}
+
 let timer;
-const startLooping = () => {
+const startLooping = async () => {
     console.log("Going to start looping");
     let currentTab = 0;
     if (timer != null) {
-        console.error("Timer is already running, not starting");
-        chrome.storage.local.set({ "is_running": false }).then(() => {
-            console.log("Value is_running is set to " + false);
-        });
+        console.error("Back: Timer is already running, not starting");
+        await saveObjectInLocalStorage({ "is_running": false });
+        console.log("Back: Value is_running is set to " + false);
         return;
     }
     timer = setInterval(() => {
@@ -40,18 +47,17 @@ const startLooping = () => {
             console.log(tabs);
             if (currentTab < tabs.length) {
                 chrome.tabs.update(tabs[currentTab].id, { highlighted: true, active: true });
-                console.log("Setting tab highlight", currentTab);
+                console.log("Back: Setting tab highlight", currentTab);
                 currentTab++;
             }
             else {
-                console.log("Setting tab to zero");
+                console.log("Back: Setting tab to zero");
                 currentTab = 0;
             }
         });
     }, 10000);
-    chrome.storage.local.set({ "is_running": true }).then(() => {
-        console.log("Value is_running is set to " + true);
-    });
+    await saveObjectInLocalStorage({ "is_running": true });
+    console.log("Back: Value is_running is set to " + true);
     chrome.action.setIcon({
         path: {
             "16": "images/icon-stop-16.png",
@@ -63,13 +69,12 @@ const startLooping = () => {
     });
 }
 
-const stopLooping = () => {
-    console.log("Clearing the timer");
+const stopLooping = async () => {
+    console.log("Back: Clearing the timer");
     clearInterval(timer);
     timer = null;
-    chrome.storage.local.set({ "is_running": false }).then(() => {
-        console.log("Value is_running is set to " + false);
-    });
+    await saveObjectInLocalStorage({ "is_running": false });
+    console.log("Back: Value is_running is set to " + false);
     chrome.action.setIcon({
         path: {
             "16": "images/icon-16.png",

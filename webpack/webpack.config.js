@@ -1,7 +1,8 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 module.exports = {
-    mode: "production",
+    mode: 'development',
+    devtool: 'inline-source-map',
     entry: {
         "popup": ['./src/popup.ts'],
         "options": ['./src/options.ts'],

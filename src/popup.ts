@@ -1,5 +1,9 @@
-chrome.storage.local.get(["default_interval"]).then((result) => {
-    console.log("Value currently default_interval is " + result.key);
+import { getObjectFromLocalStorage, saveObjectInLocalStorage } from './storage-api';
+
+const popup = (async (document) => {
+
+    const result = await getObjectFromLocalStorage("default_interval") as any;
+    console.log("Popup: Value currently default_interval is " + + JSON.stringify(result));
     if (!result) {
         const ele = document.getElementById("10sec") as HTMLInputElement;
         ele.checked = true;
@@ -10,9 +14,12 @@ chrome.storage.local.get(["default_interval"]).then((result) => {
             ele = document.getElementById("custom") as HTMLInputElement;
             ele.checked = true;
             const intervalSelector = document.getElementById("customval") as HTMLInputElement;
-            intervalSelector.value = result.key;
+            intervalSelector.value = result;
         }
     }
+
+
+
 });
 
 const start_stop = () => {
@@ -23,39 +30,36 @@ const start_stop = () => {
     });
 }
 
-
-document.addEventListener('DOMContentLoaded', function () {
+window.addEventListener('load', async  () => {
     let selectedElement = (document.querySelector('input[name="interval"]:checked') as HTMLInputElement);
     let selectedInterval;
     if (selectedElement) {
         selectedInterval = selectedElement.value;
     }
     else {
-        selectedInterval = 10
+        selectedInterval = 60
     }
     let btn = document.getElementById('startButton');
     btn.className = "start"
-    btn.addEventListener('click', function () {
+    btn.addEventListener('click', async()=> {
         start_stop();
-        chrome.storage.local.set({ "default_interval": selectedInterval }).then(() => {
-            console.log("Value default_interval is set to " + selectedInterval);
-        });
+        await saveObjectInLocalStorage({ "default_interval": selectedInterval });
+        console.log("Popup: Value default_interval is set to " + selectedInterval);
         updateButtonValue(btn);
     });
 
-    chrome.storage.local.get(["is_running"]).then((result) => {
-        console.log("Value is_running is: " + result.is_running);
-        if (result.is_running) {
-            btn.textContent = "Stop"
-            btn.className = "stop";
-        }
-        else {
-            btn.textContent = "Start"
-            btn.className = "start";
+    const result = await getObjectFromLocalStorage("is_running") as any;
+    console.log("Popup: Value is_running is: " + JSON.stringify(result));
+    if (result) {
+        btn.textContent = "Stop"
+        btn.className = "stop";
+    }
+    else {
+        btn.textContent = "Start"
+        btn.className = "start";
 
-        }
+    }
 
-    });
 });
 
 const updateButtonValue = (btn) => {
@@ -70,3 +74,5 @@ const updateButtonValue = (btn) => {
     }
 
 }
+
+popup(document);
